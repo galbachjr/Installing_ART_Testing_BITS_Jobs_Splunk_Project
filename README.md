@@ -31,116 +31,113 @@ This repository serves as a hands-on example of endpoint monitoring and threat s
 
 <h2>Before Starting, ensure the following:</h2>
 
-- <b>Windows logs/indes (For Mine is endpoint_bits) are configured to be forwarded to Splunk via the Universal Forwarder.</b> 
+- <b>Windows logs/index (For Mine is endpoint_bits) are configured to be forwarded to Splunk via the Universal Forwarder.</b> 
 - <b>Splunk has an index (windows_logs/endpoint_bits) where events from Windows are being collected.</b>
 - <b>--> (gpedit.msc) and ensure the correct audit policies are enabled</b>
 
-<h2>Creating/Testing Alerts</h2>
+<h2>Installing Atomic Red Team (ART)</h2>
 
 <p align="center">
-Alert Creation: <br/>
-<img src="https://i.imgur.com/WX1qd2N.png" height="80%" width="80%" alt="Alert Creation"/>
+Execution Policy Change: <br/>
+<img src="https://i.imgur.com/Q4LJ5Z5.png" height="80%" width="80%" alt="Execution Policy Change"/>
 <br />
 <br />
-Testing Alerts:  <br/>
-<img src="https://i.imgur.com/ktGocc2.png" height="80%" width="80%" alt="Testing Alerts"/>
+Installing ART in PowerShell:  <br/>
+<img src="https://i.imgur.com/iVldkfx.png" height="80%" width="80%" alt="Installing ART in PowerShell"/>
+  
+  - "IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -UseBasicParsing);
+Install-AtomicRedTeam"
+
+<p align="center">
+<img src="https://i.imgur.com/Ig6asUP.png" height="80%" width="80%" alt="Excluding ART Folder"/>
+
+- Go to Windows Security and Exclude the Atomic Red Team (ART) Folder.
+<p align="center">
+<img src="https://i.imgur.com/OhOBrUa.png" height="80%" width="80%" alt="Installing ART in PowerShell"/>
+
+  
 <br />
 
-  <h2>Alert 4720: Account Creation</h2>
-
-- 1. <b>Event Code 4720 is used to track account creation in Windows.</b>
+  <h2>Configuring Module Logging & Powershell Script Block Logging</h2>
   
 <br />
 <p align="center">
-Search Query Configuration:  <br/>
-<img src="https://i.imgur.com/l66PIvO.png" height="80%" width="80%" alt="Search Query Configuration"/>
+Enabling Module Logging:  <br/>
+<img src="https://i.imgur.com/JJ3Rwij.png" height="80%" width="80%" alt="Enabling Module Logging"/>
 <br />
 <br />
     
   <p align="center">
-Account Creation: <br/>
-    
-- 2. <b>For this test, I created a user named "splunktest" [-net user {name} {password} /add] </b>
+Enabling PowerShell Script Block Logging: <br/>
+
 <p align="center">
-<img src="https://i.imgur.com/SsaZOG0.png" height="80%" width="80%" alt="Account Creation"/>
+<img src="https://i.imgur.com/wDK86Om.png" height="80%" width="80%" alt="Enabling PowerShell Script Block Logging"/>
 <br />
-<br />
-  
-- 3. <b>source="WinEventLog:*" index="windows_logs" EventCode=4720</b>
-<p align="center">
-  Account Creation 4720 Alert:  <br/>
-<img src="https://i.imgur.com/dS2XwXG.png" height="80%" width="80%" alt="Account Creation 4720 Alert"/>
 <br />
 ________________________________________________________________________________________________________
- <h2>Alert 4726: Account Deletion</h2>
+  
+ <h2>Configuring Local Event Logs</h2>
 <br />
 <p align="center">
-Search Query Configuration:  <br/>
-<img src="https://i.imgur.com/MAGKcKs.png" height="80%" width="80%" alt="Search Query Configuration"/>
+Local Event Log Collection in Splunk:  <br/>
+<img src="https://i.imgur.com/S58munR.png" height="80%" width="80%" alt="Configuring Local Event Logs"/>
 <br />
 <br />
-    
-- 1. <b>Event Code 4726 is used to track account creation in Windows.</b>
-- 2. <b>source="WinEventLog:*" index="windows_logs" EventCode=4726</b>
+  
+- <b></b>Enable Application, Security, System for Event Log Collection</b>
 
  <p align="center">
- Account Deletion: <br/>
-<img src="https://i.imgur.com/X76V5Qf.png" height="80%" width="80%" alt="Account Deletion"/>
+ Configuring Event Log Collection in inputs.conf: <br/>
+<img src="https://i.imgur.com/9TtJccv.png" height="80%" width="80%" alt="Configuring Event Log Collection in inputs.conf"/>
+<br />
+   
+   - Go inside the Splunk Universal Forwarder, edit the inputs.conf, and add the 2 following.
+   
+   - [WinEventLog://Microsoft-Windows-Windows Defender/Operational] disabled = 0 index = endpoint_bits
+     
+   - [WinEventLog://Microsoft-Windows-PowerShell/Operational] disabled = 0 index = endpoint_bits
 <br />
 <br />
 
-- 3. <b>Deleted the Account I previously made, "splunktest", [-net user {name} /delete] </b>
-  
-<p align="center">
-  Account Deletion 4726 Alert:  <br/>
-<img src="https://i.imgur.com/GEYMbKF.png" height="80%" width="80%" alt="Account Deletion 4726 Alert"/>
-<br />
 ________________________________________________________________________________________________________
-<h2>Alert 4688: New Process Creation</h2>
+
+<h2>Testing BITS Jobs & Creating Alerts</h2>
 <br />
 <p align="center">
-Search Query Configuration:  <br/>
-<img src="https://i.imgur.com/pdPSL2A.png" height="80%" width="80%" alt="Search Query Configuration"/>
+BITS Jobs:  <br/>
+<img src="https://i.imgur.com/IFlYY5L.png" height="80%" width="80%" alt="BITS Jobs"/>
 <br />
 <br />
     
-- 1. <b>Event Code 4688 is a Security log event that records whenever a new process is created on the system.</b>
-- 2. <b>I only put a few process creations to log that are mostly important.</b>
-- 3. <b>source="WinEventLog:*" index="windows_logs" EventCode=4688 New Process Name:"*whoami*" </b> | <b>source="WinEventLog:*" index="windows_logs" EventCode=4688 New Process Name:"*ipconfig*" </b> |<b>source="WinEventLog:*" index="windows_logs" EventCode=4688 New Process Name:"*net.exe*" </b>
+- <b>Background Intelligent Transfer Service (BITS) jobs are Windows processes used to transfer files in the background. In cybersecurity, BITS can be abused by attackers to move files or execute commands stealthily, making them a key technique for SOC analysts to monitor in endpoint detection and response workflows.</b>
 
  <p align="center">
- Testing 'whoami', 'ipconfig', 'net user' cmds: <br/>
-<img src="https://i.imgur.com/1onxMhw.png" height="80%" width="80%" alt="Testing 'whoami', 'ipconfig', 'net user' cmds"/>
+ Testing BITS Jobs: <br/>
+<img src="https://i.imgur.com/BFdQN86.png" height="80%" width="80%" alt="Testing BITS Jobs"/>
 <br />
 <br />
   
 <p align="center">
-  New Process Creation 4688 Alert:  <br/>
-<img src="https://i.imgur.com/WdowQo5.png" height="80%" width="80%" alt="New Process Creation 4688 Alert"/>
+  BITS Jobs in Splunk:  <br/>
+<img src="https://i.imgur.com/kDGhg3A.png" height="80%" width="80%" alt="BITS Jobs in Splunk"/>
 <br />
-________________________________________________________________________________________________________
-<h2>Alert 4625: Brute Force Attacks</h2>
 <br />
+  
 <p align="center">
-Search Query Configuration:  <br/>
-<img src="https://i.imgur.com/lvXm5aD.png" height="80%" width="80%" alt="Search Query Configuration"/>
+  Creating Alerts For BITS Jobs:  <br/>
+<img src="https://i.imgur.com/UTOK7DU.png" height="80%" width="80%" alt="Creating Alerts For BITS Jobs"/>
+<br />
+
+- <b> index="endpoint_bits" sourcetype="WinEventLog:Security" | search "bitsadmin.exe" OR "AtomicRedTeam_T1197"
+
 <br />
 <br />
-    
-- 1. <b>Event Code 4625 is a Security log event and is critical for monitoring unauthorized access attempts or brute-force attacks.</b>
-- 2. <b>source="WinEventLog:*" index="windows_logs" EventCode=4625 | stats count by Account_Name, Source_Network_Address | where count > 5</b>
 
 <p align="center">
- Test Brute Force Attack: <br/>
-  
-- 3. <b>Win + L to lock your computer</b>
-- 4. <b>Replicate 5 or more failed attempts to login</b>
-  
- <p align="center">
- Brute Force Attack 4625 Alert: <br/>
-<img src="https://i.imgur.com/gDo4DxP.png" height="80%" width="80%" alt="Brute Force Attack 4625 Alert"/>
-<img src="https://i.imgur.com/VRw0L1Q.png" height="80%" width="80%" alt="Brute Force Attack 4625 Alert2"/>
+  Triggered Alerts For BITS Jobs:  <br/>
+<img src="https://i.imgur.com/wIsdkzR.png" height="80%" width="80%" alt="Triggered Alerts For BITS Jobs"/>
 <br />
+
 
 - https://github.com/galbachjr
 ________________________________________________________________________________________________________
