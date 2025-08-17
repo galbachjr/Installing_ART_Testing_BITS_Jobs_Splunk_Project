@@ -3,7 +3,7 @@
 <h2>Description</h2>
 This project demonstrates how I use a Windows 10 VM, Splunk, and Atomic Red Team (ART) T1197 tests. It includes:
 
-- Configuring Windows Security auditing and PowerShell Script Block Logging.
+- Configuring Windows Security Auditing Policies and PowerShell Script Block Logging.
 
 - Installing and setting up Atomic Red Team safely for BITS Job simulations.
 
