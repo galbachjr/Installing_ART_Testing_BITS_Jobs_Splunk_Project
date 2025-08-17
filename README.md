@@ -1,7 +1,19 @@
-<h1>Testing Alerts in Splunk Using Windows 10 Pro</h1>
+<h1>SOC Lab Project – Monitoring BITS Jobs with Splunk and Atomic Red Team</h1>
 
 <h2>Description</h2>
-This project shows how to I set up and test alerts in Splunk by using a Windows 10 computer as the data source. As a beginner, it helped me learn how to collect Windows event logs, create alerts for specific events, and make sure Splunk notifies you when something important happens on your system.
+This project demonstrates how I use a Windows 10 VM, Splunk, and Atomic Red Team (ART) T1197 tests. It includes:
+
+- Configuring Windows Security auditing and PowerShell Script Block Logging.
+
+- Installing and setting up Atomic Red Team safely for BITS Job simulations.
+
+- Forwarding Windows Security logs to Splunk for analysis.
+
+- Creating queries and alerts in Splunk to detect BITS job activity.
+
+- Demonstrating real-time monitoring and SOC-style alerting.
+
+This repository serves as a hands-on example of endpoint monitoring and threat simulation for educational and SOC training purposes.
 <br />
 
 
@@ -10,7 +22,8 @@ This project shows how to I set up and test alerts in Splunk by using a Windows 
 - <b>Windows 10 Pro installed on Vituralbox/VMWare</b> 
 - <b>Splunk Enterprise Downloaded on Windows VM</b>
 - <b>Splunk Universal Forwarder Installed on Windows VM</b>
-- <b>Sysmon Installed (Optional)</b>
+- <b>Configure Windows Security Auditing, Module Logging, PowerShell Script Block Logging, Process Creation Auditing/Termination</b>
+- <b>Atomic Red Team (ART) Installed<b>
 
 <h2>Environments Used </h2>
 
@@ -18,9 +31,9 @@ This project shows how to I set up and test alerts in Splunk by using a Windows 
 
 <h2>Before Starting, ensure the following:</h2>
 
-- <b>Windows logs are configured to be forwarded to Splunk via the Universal Forwarder.</b> 
-- <b>Splunk has an index (windows_logs) where events from Windows are being collected.</b>
-- <b>--> (gpedit.msc) and ensure the correction audit policies are enabled</b>
+- <b>Windows logs/indes (For Mine is endpoint_bits) are configured to be forwarded to Splunk via the Universal Forwarder.</b> 
+- <b>Splunk has an index (windows_logs/endpoint_bits) where events from Windows are being collected.</b>
+- <b>--> (gpedit.msc) and ensure the correct audit policies are enabled</b>
 
 <h2>Creating/Testing Alerts</h2>
 
